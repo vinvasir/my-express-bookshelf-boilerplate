@@ -36,4 +36,21 @@ Router.post('/posts', (req, res) => {
 		.catch(err => res.status(500).json({message: err}));
 });
 
+Router.get('/posts/:id', (req, res) => {
+	models.Post.forge({id: req.params.id})
+		.fetch({withRelated: ['user', 'comments.user']})
+		.then(post => res.render('posts/show', {post: post.toJSON()}))
+		.catch(err => res.status(500).json({message: err}));
+});
+
+Router.post('/comments', (req, res) => {
+	models.Comment.forge({
+		user_id: req.body.user_id,
+		post_id: req.body.post_id,
+		body: req.body.body
+	}).save()
+	.then(() => res.redirect(`/posts/${req.body.post_id}`))
+	.catch(err => res.status(500).json({message: err}));
+});
+
 module.exports = Router;

@@ -16,9 +16,11 @@
 			<% user.posts.forEach(post => { %>
 
 				<li>
-					<strong><%= post.title %>:</strong>
+					<a href="/posts/<%= post.id %>">
+						<strong><%= post.title %>:</strong>
 
-					<%= post.body %>
+						<%= post.body %>
+					</a>
 				</li>
 			<% }) %>
 		</ul>
