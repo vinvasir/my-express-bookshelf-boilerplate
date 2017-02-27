@@ -13,11 +13,30 @@ Router.get('/', (req, res) => {
     .catch(err => res.status(500).json({ message: err}));
 });
 
+Router.get('/register', (req, res) => {
+	res.render('users/new');
+});
+
+Router.post('/users', (req, res) => {
+	models.User.forge({
+		name: req.body.name,
+		username: req.body.username,
+		email: req.body.email,
+		password: req.body.password
+	}).save()
+	.then(user => res.redirect(`/users/${user.id}`))
+	.catch(err => res.status(500).json({message: err}));
+});
+
 Router.get('/users/:id', (req, res) => {
 	models.User.forge({id: req.params.id})
 		.fetch({withRelated: ['posts']})
 		.then(user => res.render('users/show', {user: user.toJSON()}))
 		.catch(err => res.status(500).json({message: err}));
+});
+
+Router.get('/login', (req, res) => {
+	res.render('login', { message: req.flash('error')});
 });
 
 Router.get('/posts/new', (req, res) => {
