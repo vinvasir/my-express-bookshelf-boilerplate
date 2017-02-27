@@ -6,6 +6,7 @@ exports.up = function(knex, Promise) {
   		table.integer('user_id');
   		table.integer('post_id');
   		table.text('body');
+      table.timestamps();
   	})
 	]);
 };

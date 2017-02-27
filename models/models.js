@@ -16,9 +16,15 @@ const Post = bookshelf.Model.extend({
   }
 });
 
+const Comment = bookshelf.Model.extend({
+  tableName: 'comments',
+  hasTimeStamps: true,
+});
+
 const models = {
 	User: User,
-	Post: Post
+	Post: Post,
+  Comment: Comment
 }
 
 module.exports = models;
