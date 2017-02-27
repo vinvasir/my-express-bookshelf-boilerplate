@@ -1,0 +1,30 @@
+<% include _header %>
+
+<h1>Hello World!</h1>
+
+<ul>
+<% users.forEach(user => { %>
+	
+	<li>
+
+		<p><a href="/users/<%= user.id %>"><%= user.name %></a></p>
+
+		<p><%= user.username %></p>
+
+		<p><%= user.email %></p>
+ 		<ul>
+			<% user.posts.forEach(post => { %>
+
+				<li>
+					<strong><%= post.title %>:</strong>
+
+					<%= post.body %>
+				</li>
+			<% }) %>
+		</ul>
+
+	</li>
+<% }) %>
+</ul>
+
+<% include _footer %>
