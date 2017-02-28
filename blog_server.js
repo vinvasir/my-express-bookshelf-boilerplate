@@ -21,7 +21,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(session({secret: 'our secret string'}));
 app.use(cookieParser());
-app.use(passport.initialize());
 
 // Configure the view engine
 app.set('views', path.join(__dirname, 'views'));
