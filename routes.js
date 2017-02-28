@@ -1,9 +1,60 @@
 const express = require('express');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+app.use(passport.initialize());
+
 const Router = express.Router();
 
 // Load the models file, which loads the db init file
 
 const models = require('./models/models.js');
+
+passport.use(new LocalStrategy((username, password, done) => {
+  models.User
+    .forge({username: username})
+    .fetch()
+    .then(usr => {
+      if (!usr) {
+        return done(null, false);
+      }
+      usr.validatePassword(password).then(valid => {
+        if (!valid) {
+          return done(null, false);
+        }
+        return done(null, usr);
+      });
+    })
+    .catch(err => {
+      return done(err)
+    });
+}));
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+ 
+passport.deserializeUser(function(user, done) {
+  models.User
+    .forge({id: user})
+    .fetch()
+    .then((usr) => {
+      done(null, usr);
+    })
+    .catch((err) => {
+      done(err);
+    });
+});
+
+// a custom middleware to log which user is signed in
+Router.use((req, res, done) => {
+  if (req.session && req.session.passport) {
+    console.log('user is logged in: ', req.session.passport);
+  }
+  else {
+    console.log('user not logged in');
+  }
+  done();
+});
 
 Router.get('/', (req, res) => {
   models.User
@@ -15,6 +66,15 @@ Router.get('/', (req, res) => {
 
 Router.get('/register', (req, res) => {
 	res.render('users/new');
+});
+
+app.post('/login',
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+    failureFlash: true
+  }),
+  function(req, res) {
+    res.redirect('/');
 });
 
 Router.post('/users', (req, res) => {
@@ -29,6 +89,9 @@ Router.post('/users', (req, res) => {
 });
 
 Router.get('/users/:id', (req, res) => {
+	if (req.session.passport === req.params.id) {
+		console.log("You're viewing your own profile!");
+	}
 	models.User.forge({id: req.params.id})
 		.fetch({withRelated: ['posts']})
 		.then(user => res.render('users/show', {user: user.toJSON()}))
